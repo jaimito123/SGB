@@ -324,6 +324,25 @@ public class SgObraJpaController implements Serializable {
         return findSgObraEntities(true, -1, -1);
     }
 
+    public List<SgObra> findSgObraEntities(String cadeira) {
+        EntityManager em = getEntityManager();
+        String n = "%" + cadeira.toLowerCase() + "%";
+        Query q = em.createQuery("from SgObra o where lower(o.area.descricao) like :texto");
+        q.setParameter("texto", n);
+        
+        return q.getResultList();
+    }
+
+    /*public List<Inquerido> findInquerido(String texto){
+       EntityManager em = getEntityManager();
+       
+       String n = "%"+texto.toLowerCase()+"%";
+       
+       Query q = em.createQuery("from Inquerido i where lower(i.nome) like :texto");
+       q.setParameter("texto", n);
+       return q.getResultList();
+    }*/
+
     public List<SgObra> findSgObraEntities(int maxResults, int firstResult) {
         return findSgObraEntities(false, maxResults, firstResult);
     }
@@ -365,5 +384,5 @@ public class SgObraJpaController implements Serializable {
             em.close();
         }
     }
-    
+
 }

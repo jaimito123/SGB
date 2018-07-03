@@ -5,22 +5,25 @@
  */
 package controlador.paginas;
 
+//import static com.sun.corba.se.spi.presentation.rmi.StubAdapter.request;
 import conexao.JPA;
+import controladores.entidades.BLeitorJpaController;
 import controladores.entidades.CursoJpaController;
 import controladores.entidades.SgAutorJpaController;
 import controladores.entidades.SgExemplarJpaController;
 import controladores.entidades.SgObraAreaJpaController;
-import controladores.entidades.SgObraAutorJpaController;
+//import controladores.entidades.SgObraAutorJpaController;
 import controladores.entidades.SgObraCategoriaJpaController;
 import controladores.entidades.SgObraJpaController;
 import controladores.entidades.UsersJpaController;
+import entidades.BLeitor;
 import entidades.Curso;
 import entidades.SgAutor;
 import entidades.SgExemplar;
 import entidades.SgObra;
 import entidades.SgObraArea;
-import entidades.SgObraAutor;
-import entidades.SgObraAutorPK;
+//import entidades.SgObraAutor;
+//import entidades.SgObraAutorPK;
 import entidades.SgObraCategoria;
 import entidades.Users;
 import java.io.File;
@@ -30,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+//import java.util.List;
 import java.util.Locale;
 import org.zkoss.io.Files;
 import org.zkoss.lang.Strings;
@@ -49,10 +53,12 @@ import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Panel;
+import org.zkoss.zul.Menuitem;
+//import org.zkoss.zul.Panel;
 import org.zkoss.zul.Separator;
 import org.zkoss.zul.Textbox;
 import servicos.Autenticacao;
@@ -70,13 +76,14 @@ public class ObraController extends SelectorComposer<Component> {
     private String filePath;
     private boolean fileuploaded = false;
     private Media media;
+    private ListModel<SgObra> obrasModel;
     SgObra Obra;
     SgExemplar exemp;
     SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyy", Locale.ENGLISH);
 
     @Wire
     Listbox combo_curso, combo_categoria, combo_area, lista_autores, lista_autores2, list_tipo,
-            comboidioma, comboAquisicao, livros, comboAquis;
+            comboidioma, comboAquisicao, livros, comboAquis, lisObras;
 
     @Wire
     Textbox text_directory, autor_search, exemplares, ano_publicacao, edicao, local_edicao, editora, cota, isbn, volume,
@@ -99,7 +106,7 @@ public class ObraController extends SelectorComposer<Component> {
     Datebox dataAquisicao, dataAquis;
 
     @Wire
-    Div painelLivro, painelExemplar;
+    Div painelLivro, painelExemplar, divObras;
 
     @Wire
     Label tituloLivro, volumeLivro, edicaoLivro, cotaLivro, isbnLivro, anoLivro, localEdicaoLivro, editoraLivro,
@@ -111,17 +118,110 @@ public class ObraController extends SelectorComposer<Component> {
 
     @Wire
     Label nomeLabel, isbnLabel, edicaoLabel, volumeLabel, editoraLabel;
-    
+
     @Wire
     Listitem categ;
 
+    @Wire
+    Menuitem mate;
+    
     //Declaracao da segunda lista
     ListModelList<SgAutor> lista2 = new ListModelList<SgAutor>();
+    ListModelList<SgObra> obras = new ListModelList<SgObra>();
+
+    /*--------------------------------------------------- listagem de obras --------------------------------------------------------------*/
+    @Listen("onClick= #matematica")
+    public void ListObrasMatematica() {
+        divPrincipal.setVisible(false);
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Matemática"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #informatica")
+    public void ListObrasInformatica() {
+        divPrincipal.setVisible(false);
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Informática"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #cb")
+    public void ListObrasCienciaBiol() {
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Ciências Biológicas"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #cs")
+    public void ListObrasCienciaCienciasSoc() {
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Ciências Sociais"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #ll")
+    public void ListObrasCienciaLinguisticaLit() {
+        divPrincipal.setVisible(false);
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Linguística e Literatura"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #fisica")
+    public void ListObrasCienciaFisica() {
+        divPrincipal.setVisible(false);
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Física"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #qcm")
+    public void ListObrasCienciaQuimicaCM() {
+        divPrincipal.setVisible(false);
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Química e Ciências Mineralógicas"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #gh")
+    public void ListObrasCienciaGeologiaHid() {
+        divPrincipal.setVisible(false);
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Geologia e Hidrografia"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #botanica")
+    public void ListObrasCienciaBotanica() {
+        divPrincipal.setVisible(false);
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Botânica"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #zoologia")
+    public void ListObrasCienciaZoologia() {
+        divPrincipal.setVisible(false);
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Zoologia"));
+        lisObras.setVisible(true);
+        lisObras.setModel(books);
+    }
+
+    @Listen("onClick= #mcm")
+    public void ListObrasCienciaMCM() {
+        divPrincipal.setVisible(false);
+        ListModelList<SgObra> books = new ListModelList<SgObra>(new SgObraJpaController(new JPA().getEmf()).findSgObraEntities("Medicina e Ciências Médicas"));
+        lisObras.setVisible(true);//Medicina e Ciências Médicas
+        lisObras.setModel(books);
+    }
+
+    /*------------------------ listagem de obras --------------------------------------------------------------*/
 
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-
+        divPrincipal.setVisible(false);
         UserCredential cre = authService.getUserCredential();
         this.currentUser = new UsersJpaController(new JPA().getEmf()).findUsers(cre.getAccount());
     }
@@ -291,22 +391,25 @@ public class ObraController extends SelectorComposer<Component> {
         //=================================================================================
         //                          No caso de ser um livro
         //=================================================================================
+
         if (tipoObra.equals("Livro")) {
-            if (titulo.getValue() != null || volume.getValue() != null || isbn.getValue() != null
-                    || cota.getValue() != null || editora.getValue() != null || edicao.getValue() != null
-                    || local_edicao.getValue() != null || ano_publicacao.getValue() != null) {
+            if (Strings.isBlank(titulo.getValue()) || Strings.isBlank(volume.getValue()) || Strings.isBlank(isbn.getValue()) || Strings.isBlank(cota.getValue()) || Strings.isBlank(editora.getValue()) || Strings.isBlank(edicao.getValue())
+                    || Strings.isBlank(local_edicao.getValue()) || Strings.isBlank(ano_publicacao.getValue())) {
+                Clients.showNotification("Preencha todos os campos!", "warning", null, null, 3000);
+//                
+            } else {
                 obra.setIdlivro(Long.MIN_VALUE);
                 obra.setTitulo(titulo.getValue());
                 obra.setDominio((SgObraCategoria) combo_categoria.getSelectedItem().getValue());//Categoria
-                obra.setVolume(BigInteger.valueOf(Long.parseLong(volume.getValue())));
+                obra.setVolume(new BigInteger(volume.getValue()));
                 obra.setIsbn(isbn.getValue());
                 obra.setCota(cota.getValue());
                 obra.setEditora(editora.getValue());
                 obra.setEdicaoCidade(local_edicao.getValue());
                 obra.setIdioma(comboidioma.getSelectedItem().getValue().toString());
                 obra.setArea((SgObraArea) combo_area.getSelectedItem().getValue());
-                obra.setEdicao(BigInteger.valueOf(Long.parseLong(edicao.getValue())));
-                obra.setPublicacaoAno(BigInteger.valueOf(Long.parseLong(ano_publicacao.getValue())));
+                obra.setEdicao(new BigInteger(edicao.getValue()));
+                obra.setPublicacaoAno(new BigInteger(ano_publicacao.getValue()));
                 obra.setCadastroData(new Date());
                 obra.setTipoObra(list_tipo.getSelectedItem().getLabel());
                 if (!rd_directory.isChecked()) {
@@ -315,21 +418,23 @@ public class ObraController extends SelectorComposer<Component> {
                     obra.setFormato("Electronico");
                 }
                 obra.setBibliotecario(currentUser);
-            } else {
-                Clients.showNotification("Preencha todos os campos!", "warning", null, null, 3000);
-                return;
+
             }
         }
-        //=================================================================================
-        //                          No caso de ser uma monografia
-        //=================================================================================
+//        //=================================================================================
+//        //                          No caso de ser uma monografia
+//        //=================================================================================
         if (tipoObra.equals("Monografia")) {
-            if (titulo.getValue() != null || cota.getValue() != null || local_edicao.getValue() != null || ano_publicacao.getValue() != null) {
+            if (Strings.isBlank(titulo.getValue()) || Strings.isBlank(volume.getValue()) || Strings.isBlank(isbn.getValue()) || Strings.isBlank(cota.getValue()) || Strings.isBlank(editora.getValue()) || Strings.isBlank(edicao.getValue())
+                    || Strings.isBlank(local_edicao.getValue()) || Strings.isBlank(ano_publicacao.getValue())) {
+                Clients.showNotification("Preencha todos os campos!", "warning", null, null, 3000);
+//                
+            } else {
                 obra.setIdlivro(Long.MIN_VALUE);
                 obra.setTitulo(titulo.getValue());
                 obra.setCota(cota.getValue());
                 obra.setEdicaoCidade(local_edicao.getValue());
-                obra.setPublicacaoAno(BigInteger.valueOf(Long.parseLong(ano_publicacao.getValue())));
+                obra.setPublicacaoAno(new BigInteger(ano_publicacao.getValue()));
                 obra.setTipoObra(list_tipo.getSelectedItem().getLabel());
                 obra.setDominio((SgObraCategoria) combo_categoria.getSelectedItem().getValue());//Categoria
                 obra.setIdioma(comboidioma.getSelectedItem().getValue().toString());
@@ -343,30 +448,30 @@ public class ObraController extends SelectorComposer<Component> {
                 }
                 obra.setBibliotecario(currentUser);
 
-            } else {
-                Clients.showNotification("Preencha todos os campos!", "warning", null, null, 3000);
-                return;
             }
         }
-        //=================================================================================
-        //                          No caso de ser uma revista
-        //=================================================================================
+
+//        //=================================================================================
+//        //                          No caso de ser uma revista
+//        //=================================================================================
         if (tipoObra.equals("Revista") || tipoObra.equals("Jornal")) {
-            if (titulo.getValue() != null || volume.getValue() != null || nome.getValue() != null
-                    || cota.getValue() != null || editora.getValue() != null || edicao.getValue() != null
-                    || local_edicao.getValue() != null || ano_publicacao.getValue() != null) {
+            if (Strings.isBlank(titulo.getValue()) || Strings.isBlank(volume.getValue()) || Strings.isBlank(isbn.getValue()) || Strings.isBlank(cota.getValue()) || Strings.isBlank(editora.getValue()) || Strings.isBlank(edicao.getValue())
+                    || Strings.isBlank(local_edicao.getValue()) || Strings.isBlank(ano_publicacao.getValue())) {
+                Clients.showNotification("Preencha todos os campos!", "warning", null, null, 3000);
+//                
+            } else {
                 obra.setIdlivro(Long.MIN_VALUE);
                 obra.setTitulo(titulo.getValue());
                 obra.setDominio((SgObraCategoria) combo_categoria.getSelectedItem().getValue());//Categoria
-                obra.setVolume(BigInteger.valueOf(Long.parseLong(volume.getValue())));
+                obra.setVolume(new BigInteger(volume.getValue()));
                 obra.setNome(nome.getValue());
                 obra.setCota(cota.getValue());
                 obra.setEditora(editora.getValue());
                 obra.setEdicaoCidade(local_edicao.getValue());
                 obra.setIdioma(comboidioma.getSelectedItem().getValue().toString());
                 obra.setArea((SgObraArea) combo_area.getSelectedItem().getValue());
-                obra.setEdicao(BigInteger.valueOf(Long.parseLong(edicao.getValue())));
-                obra.setPublicacaoAno(BigInteger.valueOf(Long.parseLong(ano_publicacao.getValue())));
+                obra.setEdicao(new BigInteger(edicao.getValue()));
+                obra.setPublicacaoAno(new BigInteger(ano_publicacao.getValue()));
                 obra.setCadastroData(new Date());
                 obra.setTipoObra(list_tipo.getSelectedItem().getLabel());
                 if (!rd_directory.isChecked()) {
@@ -375,32 +480,34 @@ public class ObraController extends SelectorComposer<Component> {
                     obra.setFormato("Electronico");
                 }
                 obra.setBibliotecario(currentUser);
-            } else {
-                Clients.showNotification("Preencha todos os campos!", "warning", null, null, 3000);
-                return;
             }
         }
-        //==========================================================================
-        //===========================Registo do livro===============================
-        //==========================================================================
+//        //==========================================================================
+//        //===========================Registo do livro===============================
+//        //==========================================================================
         try {
             new SgObraJpaController(new JPA().getEmf()).create(obra);
+
         } catch (Exception ex) {
             Clients.showNotification("nao foi possivel registar a obra", "warning", null, null, 3000);
             return;
         }
         //=========================Adicao de autores============================
-        SgObraAutor oa = new SgObraAutor();
-        for (SgAutor aut : lista2) {
-            SgObraAutorPK sgoapk = new SgObraAutorPK(aut.getIdautor(), obra.getIdlivro(), new Date());
-            oa.setSgObraAutorPK(sgoapk);
-            try {
-                new SgObraAutorJpaController(new JPA().getEmf()).create(oa);
-            } catch (Exception ex) {
-                Clients.showNotification("nao foi possivel adicionar o autor " + aut.getNome(), "warning", null, null, 3000);
-                return;
-            }
-        }
+//        SgObraAutor oa = new SgObraAutor();
+//        for (SgAutor aut : lista2) {
+//       //   SgObraAutorPK sgoapk = new SgObraAutorPK(aut.getIdautor(), obra.getIdlivro(), new Date());
+//           // oa.setSgObraAutorPK(sgoapk);
+////           oa.setDataAlocacao(new Date());
+////           oa.setIdautor(aut.getIdautor());
+////           oa.setIdlivro(obra);
+//            try {
+//                new SgObraAutorJpaController(new JPA().getEmf()).create(oa);
+//       
+//            } catch (Exception ex) {
+//                Clients.showNotification("nao foi possivel adicionar o autor " + aut.getNome(), "warning", null, null, 3000);
+//                return;
+//            }
+//        }
         //============================Adicao de exemplares==========================
         SgExemplar exempl = new SgExemplar();
         exempl.setDataAquisicao(dataAquisicao.getValue());
@@ -418,11 +525,23 @@ public class ObraController extends SelectorComposer<Component> {
             try {
                 new SgExemplarJpaController(new JPA().getEmf()).create(exempl);
                 Clients.showNotification("Registo efectuado com sucesso", "info", null, null, 3000);
+
             } catch (Exception ex) {
                 Clients.showNotification("nao foi possivel adicionar os exemplares", "warning", null, null, 3000);
                 return;
             }
         }
+
+        titulo.setValue(null);
+        volume.setValue(null);
+        isbn.setValue(null);
+        cota.setValue(null);
+        editora.setValue(null);
+        edicao.setValue(null);
+        local_edicao.setValue(null);
+        ano_publicacao.setValue(null);
+        autor_search.setValue(null);
+
     }
 
     @Listen("onChanging = #exemplares")
@@ -573,10 +692,10 @@ public class ObraController extends SelectorComposer<Component> {
             editoraLabel.setVisible(false);
             editoraLivro.setVisible(false);
             localEdicaoLivro.setValue(O.getEdicaoCidade());
-            
+
         }
     }
-    
+
     public void mostrarExemplar(SgExemplar exemplar) {
         tituloLivroExe.setValue(exemplar.getObraRef().getTitulo());
         cotaLivroExe.setValue(exemplar.getObraRef().getCota());
@@ -588,15 +707,15 @@ public class ObraController extends SelectorComposer<Component> {
         dataRegistoLivroExe.setValue(formatter.format(exemplar.getDataRegisto()));
         dataAquisicaoLivroExe.setValue(formatter.format(exemplar.getDataAquisicao()));
         nrRegisto.setValue(exemplar.getNrRegisto().toString());
-        if(exemplar.getEstado() != null && exemplar.getEstado().equals("Fixo")){
+        if (exemplar.getEstado() != null && exemplar.getEstado().equals("Fixo")) {
             estadoExe.setValue(exemplar.getEstado());
             estadoExe.setSclass("label label-info");
         }
-        if(exemplar.getEstado() != null && exemplar.getEstado().equals("Disponivel")){
+        if (exemplar.getEstado() != null && exemplar.getEstado().equals("Disponivel")) {
             estadoExe.setValue(exemplar.getEstado());
             estadoExe.setSclass("label label-success");
         }
-        if(exemplar.getEstado() != null && exemplar.getEstado().equals("Emprestado")){
+        if (exemplar.getEstado() != null && exemplar.getEstado().equals("Emprestado")) {
             estadoExe.setValue(exemplar.getEstado());
             estadoExe.setSclass("label label-primary");
         }
@@ -650,7 +769,7 @@ public class ObraController extends SelectorComposer<Component> {
             editoraLabelExe.setVisible(false);
             editoraLivroExe.setVisible(false);
             localEdicaoLivroExe.setValue(exemplar.getObraRef().getEdicaoCidade());
-            
+
         }
     }
 
@@ -667,7 +786,7 @@ public class ObraController extends SelectorComposer<Component> {
 
     @Listen("onClick = #Addexe")
     public void adicionarExemplar() {
-        if (qtdExemplares.getValue() == null || dataAquis.getValue() == null || comboAquis.getSelectedItem().getLabel() == null) {
+        if (Strings.isBlank(qtdExemplares.getValue()) || dataAquis.getValue() == null || comboAquis.getSelectedItem().getLabel() == null) {
             Clients.showNotification("Preencha todos os campos", "warning", null, null, 3000);
         } else {
             SgExemplar exempl = new SgExemplar();
@@ -695,28 +814,29 @@ public class ObraController extends SelectorComposer<Component> {
             }
         }
     }
-    
+
     public void tipoObra(SgObra book) {
         titulo.setValue(book.getTitulo());
         cota.setValue(book.getCota());
-        ano_publicacao.setValue(book.getPublicacaoAno().toString());
+        ano_publicacao.setValue("" + book.getPublicacaoAno());
         local_edicao.setValue(book.getEdicaoCidade());
-        SgObra ob = new SgObraJpaController(new JPA().getEmf()).findSgObra(book.getIdlivro());
-        ListModelList<SgObraAutor> listaAut = new ListModelList<SgObraAutor>(ob.getSgObraAutorList());
-        lista2.clear();
-        for (SgObraAutor obrautor : listaAut) {
-            lista2.add(obrautor.getSgAutor());
-        }
-        lista_autores2.setModel(lista2);           
+        volume.setValue("" + book.getVolume());
+//        SgObra ob = new SgObraJpaController(new JPA().getEmf()).findSgObra(book.getIdlivro());
+//        ListModelList<SgObraAutor> listaAut = new ListModelList<SgObraAutor>(ob.getSgObraAutorList());
+//        lista2.clear();
+//        for (SgObraAutor obrautor : listaAut) {
+//            lista2.add(obrautor.getSgAutor());
+//        }
+        lista_autores2.setModel(lista2);
         if (book.getTipoObra().equals("Livro")) {
-            vol.setVisible(true);
-            volume.setValue(book.getVolume().toString());
-            edit.setVisible(true);
+            //vol.setVisible(true);
+            volume.setValue("2");
+            //edit.setVisible(true);
             editora.setValue(book.getEditora());
-            edic.setVisible(true);
-            edicao.setValue(book.getEdicao().toString());
-            cur.setVisible(false);
-            nom.setVisible(false);
+            //edic.setVisible(true);
+            edicao.setValue("" + book.getEdicao());
+            //cur.setVisible(false);
+            //nom.setVisible(false);
         }
         if (book.getTipoObra().equals("Monografia")) {
             vol.setVisible(false);
@@ -729,25 +849,28 @@ public class ObraController extends SelectorComposer<Component> {
             edit.setVisible(true);
             editora.setValue(book.getEditora());
             edic.setVisible(true);
-            edicao.setValue(book.getEdicao().toString());
+            edicao.setValue("" + book.getEdicao());
             vol.setVisible(true);
-            volume.setValue(book.getVolume().toString());
+            volume.setValue("" + book.getVolume());
             nom.setVisible(true);
             nome.setValue(book.getNome());
             cur.setVisible(false);
         }
     }
-    
+
     @Listen("onClick = #editarObra")
-    public void mostrarDivEdicao(){
+
+    public void mostrarDivEdicao() {
+
         divLivro.setVisible(false);
         divEdicao.setVisible(true);
-        
+
         tipoObra(Obra);
+
     }
-    
+
     @Listen("onClick = #guardarEdicao")
-    public void editarObra(){
+    public void editarObra() {
         String tipoObra = Obra.getTipoObra();
         SgObra obra = new SgObraJpaController(new JPA().getEmf()).findSgObra(Obra.getIdlivro());
         //=================================================================================
@@ -760,14 +883,14 @@ public class ObraController extends SelectorComposer<Component> {
                 obra.setIdlivro(Long.MIN_VALUE);
                 obra.setTitulo(titulo.getValue());
                 obra.setDominio((SgObraCategoria) combo_categoria.getSelectedItem().getValue());//Categoria
-                obra.setVolume(BigInteger.valueOf(Long.parseLong(volume.getValue())));
+                obra.setVolume(new BigInteger(volume.getValue()));
                 obra.setCota(cota.getValue());
                 obra.setEditora(editora.getValue());
                 obra.setEdicaoCidade(local_edicao.getValue());
                 obra.setIdioma(comboidioma.getSelectedItem().getValue().toString());
                 obra.setArea((SgObraArea) combo_area.getSelectedItem().getValue());
-                obra.setEdicao(BigInteger.valueOf(Long.parseLong(edicao.getValue())));
-                obra.setPublicacaoAno(BigInteger.valueOf(Long.parseLong(ano_publicacao.getValue())));
+                obra.setEdicao(new BigInteger(edicao.getValue()));
+                obra.setPublicacaoAno(new BigInteger(ano_publicacao.getValue()));
                 obra.setBibliotecario(currentUser);
             } else {
                 Clients.showNotification("Preencha todos os campos!", "warning", null, null, 3000);
@@ -783,7 +906,7 @@ public class ObraController extends SelectorComposer<Component> {
                 obra.setTitulo(titulo.getValue());
                 obra.setCota(cota.getValue());
                 obra.setEdicaoCidade(local_edicao.getValue());
-                obra.setPublicacaoAno(BigInteger.valueOf(Long.parseLong(ano_publicacao.getValue())));
+                obra.setPublicacaoAno(new BigInteger(ano_publicacao.getValue()));
                 obra.setDominio((SgObraCategoria) combo_categoria.getSelectedItem().getValue());//Categoria
                 obra.setIdioma(comboidioma.getSelectedItem().getValue().toString());
                 obra.setArea((SgObraArea) combo_area.getSelectedItem().getValue());
@@ -805,15 +928,15 @@ public class ObraController extends SelectorComposer<Component> {
                 obra.setIdlivro(Long.MIN_VALUE);
                 obra.setTitulo(titulo.getValue());
                 obra.setDominio((SgObraCategoria) combo_categoria.getSelectedItem().getValue());//Categoria
-                obra.setVolume(BigInteger.valueOf(Long.parseLong(volume.getValue())));
+                obra.setVolume(new BigInteger(volume.getValue()));
                 obra.setNome(nome.getValue());
                 obra.setCota(cota.getValue());
                 obra.setEditora(editora.getValue());
                 obra.setEdicaoCidade(local_edicao.getValue());
                 obra.setIdioma(comboidioma.getSelectedItem().getValue().toString());
                 obra.setArea((SgObraArea) combo_area.getSelectedItem().getValue());
-                obra.setEdicao(BigInteger.valueOf(Long.parseLong(edicao.getValue())));
-                obra.setPublicacaoAno(BigInteger.valueOf(Long.parseLong(ano_publicacao.getValue())));
+                obra.setEdicao(new BigInteger(edicao.getValue()));
+                obra.setPublicacaoAno(new BigInteger(ano_publicacao.getValue()));
                 obra.setBibliotecario(currentUser);
             } else {
                 Clients.showNotification("Preencha todos os campos!", "warning", null, null, 3000);
@@ -830,7 +953,7 @@ public class ObraController extends SelectorComposer<Component> {
             return;
         }
         //=========================Adicao de autores============================
-        
+
 //        for (SgAutor aut : lista2) {
 //            SgObraAutorPK sgoapk = new SgObraAutorPK(aut.getIdautor(), obra.getIdlivro(), new Date());
 //            SgObraAutor oa = new SgObraAutorJpaController(new JPA().getEmf()).findSgObraAutor(sgoapk);
@@ -844,20 +967,20 @@ public class ObraController extends SelectorComposer<Component> {
 //        }
         Clients.showNotification("Obra editada com sucesso", "info", null, null, 3000);
     }
-    
+
     @Listen("onChanging = #nrExemplarSearch")
-    public void searchByNrExemplar(InputEvent event){
+    public void searchByNrExemplar(InputEvent event) {
         String numero = event.getValue();
         painelLivro.setVisible(false);
         painelExemplar.setVisible(false);
         divEdicao.setVisible(false);
-        if(Strings.isBlank(numero)){
+        if (Strings.isBlank(numero)) {
             divLivro.setVisible(false);
         } else {
             SgExemplar exe = new SgExemplarJpaController(new JPA().getEmf()).findSgExemplar(Long.parseLong(numero));
-            if(exe == null)
+            if (exe == null) {
                 Clients.showNotification("Exemplar não encontrado", "warning", nrExemplarSearch, "after_start", 3000);
-            else {
+            } else {
                 Obra = exe.getObraRef();
                 exemp = exe;
                 mostrarExemplar(exemp);
@@ -866,5 +989,5 @@ public class ObraController extends SelectorComposer<Component> {
             }
         }
     }
-    
+
 }

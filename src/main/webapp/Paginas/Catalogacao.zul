@@ -4,10 +4,20 @@
 <zk xmlns="http://www.zkoss.org/2005/zul">
     <div sclass="conteudo" apply="controlador.paginas.ObraController">
         <menupopup id="m1">
-            <menuitem label="Action" />
-            <menuitem label="Another action" />
+            <menuitem id="matematica" label="Matemática" disabled="false"/>
+            <menuitem id="informatica" label="Informática" />
+            <menuitem id="cb" label="Ciências Biológicas" />
+            <menuitem id="cs" label="Ciências Sociais" />
+            <menuitem id="ll" label="Linguística e Literatura" />
+            <menuitem id="fisica" label="Física" />
+            <menuitem id="qcm" label="Química e Ciências Mineralógicas" />
+            <menuitem id="gh" label="Geologia e Hidrografia" />
+            <menuitem id="botanica" label="Botânica" />
+            <menuitem id="zoologia" label="Zoologia" />
+            <menuitem id="mcm" label="Medicina e Ciências Médicas"/>
+      
             <menuseparator />
-            <menuitem label="Separated link" />
+            <menuitem label="Ciências do Meio Ambiente" />
         </menupopup>
         <div sclass="sub-menu">
             <hlayout>
@@ -64,7 +74,36 @@
                 </template>	
             </listbox>
             <!--=========================================================================================-->
-            <!--                            Painel para Livros                                           -->
+            <div>
+                <listbox id="lisObras" mold="paging" emptyMessage="Lista vazia" rows="6" visible="false">
+                    <listhead>
+                        <listheader width="32px"/>
+                        <listheader label="Titulo" align="center" sort="auto(titulo)"/>
+                        <listheader label="Descricao" align="center" sort="auto(edicao)"/>
+                        <listheader label="Formato" align="center" sort="auto(formato)"/>
+                        <listheader label="Idioma" align="center" sort="auto(idioma)"/>
+                    </listhead>
+                            
+                    <template name="model">
+                        <listitem>
+                            <listcell />
+                            <listcell>
+                                <label value="${each.titulo}" />
+                            </listcell>
+                            <listcell>
+                                <label value="${each.edicao}" />
+                            </listcell>
+                            <listcell>    
+                                <label value="${each.formato}" />
+                            </listcell>
+                            <listcell>
+                                <label value="${each.idioma}" />
+                            </listcell>
+                        </listitem>    
+                    </template>
+                </listbox>
+            </div>
+
             <!--=========================================================================================-->
             <separator/>
             <div id="divLivro" visible="false">
@@ -136,10 +175,10 @@
                                         divAddObra.setVisible(true);
                                         editarObra.setDisabled(true);
                                         addExemplar.setDisabled(true);
-                                        removeExemplar.setDisabled(true);
+                                        
                                     </attribute>
                                 </button>
-                                <button sclass="btn-primary" image="/Icons/ic_book_minus.png" id="removeExemplar" tooltiptext="Remover exemplar"/>
+                                
                             </div>
                         </hlayout>
                     </div>
@@ -241,7 +280,7 @@
                                     <div sclass="col-lg-6">
                                         <div sclass="input-group">
                                             <span sclass="input-group-addon">Quantidade</span>
-                                            <textbox sclass="form-control" id="qtdExemplares"/>
+                                            <decimalbox sclass="form-control" id="qtdExemplares"/>
                                         </div>
                                     </div>
                                 </div>
@@ -254,7 +293,7 @@
                                                 divAddObra.setVisible(false);
                                                 editarObra.setDisabled(false);
                                                 addExemplar.setDisabled(false);
-                                                removeExemplar.setDisabled(false);
+                                          
                                             </attribute>
                                         </button>
                                     </div>
@@ -291,7 +330,7 @@
                         <div sclass="col-lg-6" id="vol">
                             <div sclass="input-group">
                                 <span sclass="input-group-addon">Volume</span>
-                                <textbox sclass="form-control" id="volume"/>
+                                <decimalbox sclass="form-control" id="volume"/>
                             </div>
                         </div>
                     </div>
@@ -371,7 +410,7 @@
                         <div sclass="col-lg-6" id="ano_pub">
                             <div sclass="input-group">
                                 <span sclass="input-group-addon">Ano de publicação</span>
-                                <textbox sclass="form-control" id="ano_publicacao"/>
+                                <decimalbox sclass="form-control" id="ano_publicacao"/>
                             </div>
                         </div>
                     </div>
