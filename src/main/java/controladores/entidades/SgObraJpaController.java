@@ -325,9 +325,11 @@ public class SgObraJpaController implements Serializable {
     }
 
     public List<SgObra> findSgObraEntities(String cadeira) {
+        int aux;
         EntityManager em = getEntityManager();
         String n = "%" + cadeira.toLowerCase() + "%";
         Query q = em.createQuery("from SgObra o where lower(o.area.descricao) like :texto");
+        
         q.setParameter("texto", n);
         
         return q.getResultList();
@@ -335,7 +337,7 @@ public class SgObraJpaController implements Serializable {
 
     /*public List<Inquerido> findInquerido(String texto){
        EntityManager em = getEntityManager();
-       
+       jaimito lucio chrisbel
        String n = "%"+texto.toLowerCase()+"%";
        
        Query q = em.createQuery("from Inquerido i where lower(i.nome) like :texto");
